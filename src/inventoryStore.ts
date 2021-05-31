@@ -1,4 +1,14 @@
+interface Categories {
+  name: string,
+  displayName: string,
+  subCategories: { name: string, displayName: string }[]
+}
+
 class InventoryStore {
+  _categories: Categories[] = [];
+  _items: InventoryItem[] = [];
+  _isInitialized: Promise<boolean>;
+
   /** the inventory categories */
   get categories() {
     return this._categories;
@@ -15,9 +25,6 @@ class InventoryStore {
   }
 
   constructor() {
-    // define and initialize properties (which happen to be "private")
-    this._categories = [];
-    this._items = [];
 
     // load initial set of data
     this._isInitialized = this._load();
@@ -29,7 +36,7 @@ class InventoryStore {
    * @param {string} trackingNumber the item's tracking number
    * @returns the inventory item with the given tracking number, or null
    */
-  getItem(trackingNumber) {
+  getItem(trackingNumber: string): InventoryItem {
     return this._items.find(x => x.trackingNumber === trackingNumber);
   }
 
@@ -77,8 +84,8 @@ class InventoryStore {
       return errors;
     }
 
-    if (!item.type) {
-      addError("type", "Please select a valid Category");
+    if (!item.inventoryType) {
+      addError("inventoryType", "Please select a valid Category");
     }
 
     if (!item.name) {
@@ -95,7 +102,7 @@ class InventoryStore {
 
     //#endregion
 
-    switch (item.type) {
+    switch (item.inventoryType) {
       // Computer-specific validation
       case "computer":
         if (item.year > new Date().getFullYear()) {
@@ -137,7 +144,7 @@ class InventoryStore {
     return this._save();
   }
 
-  //#region Private methods
+  //#region Protected methods
 
   /*  NOTE:
    *  This demo uses local storage to save and load inventory items,
@@ -173,10 +180,11 @@ class InventoryStore {
   }
 
   //#endregion
+  
+  // Create a "static" singleton instance for the entire application to use
+  static instance = new InventoryStore();
 }
 
-// Create a "static" singleton instance for the entire application to use
-InventoryStore.instance = new InventoryStore();
 
-// Expose the singleton as the default export
-export default InventoryStore.instance;
+// Expose the singleton in its own variable
+const inventoryStore = InventoryStore.instance;
