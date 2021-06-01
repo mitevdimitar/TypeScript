@@ -5,9 +5,9 @@ interface Categories {
 }
 
 class InventoryStore {
-  _categories: Categories[] = [];
-  _items: InventoryItem[] = [];
-  _isInitialized: Promise<boolean>;
+  private _categories: Categories[] = [];
+  private _items: InventoryItem[] = [];
+  private _isInitialized: Promise<boolean>;
 
   /** the inventory categories */
   get categories() {
@@ -158,7 +158,7 @@ class InventoryStore {
    *
    * @private  <-- just information, doesn't actually do anything at runtime
    */
-  _load() {
+  protected _load() {
     return Promise.all([
       getFromStorage("Categories"),
       getFromStorage("Inventory")
@@ -175,7 +175,7 @@ class InventoryStore {
    *
    * @private  <-- just information, doesn't actually do anything at runtime
    */
-  _save() {
+  protected _save() {
     return saveToStorage("Inventory", this._items);
   }
 
